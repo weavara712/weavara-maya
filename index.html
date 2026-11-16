@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0F2347">
+  <meta name="description" content="Discover timeless Indian sarees at WEAVARA. Shop elegant silk, Banarasi, Kanjivaram, cotton and festive sarees.">
+  <title>WEAVARA | Timeless Indian Elegance</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0F2347;
+      --gold: #C8A156;
+      --ivory: #F8F4E8;
+      --beige: #E7D9C8;
+      --maroon: #6B1E2E;
+      --sage: #7A8F63;
+      --ink: #242424;
+      --muted: #716b62;
+      --white: #fffdf8;
+      --serif: "Cormorant Garamond", Georgia, serif;
+      --sans: "Jost", Arial, sans-serif;
+      --shadow: 0 16px 45px rgba(15,35,71,.12);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--ivory); color: var(--navy); font-family: var(--sans); }
+    body.locked { overflow: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    img { display: block; width: 100%; object-fit: cover; }
+    .announcement { background: var(--navy); color: var(--ivory); text-align: center; padding: 9px 14px; font-size: 11px; letter-spacing: 1.4px; }
+    .announcement strong { color: var(--gold); font-weight: 600; }
+    .site-header { position: sticky; top: 0; z-index: 20; background: rgba(248,244,232,.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(200,161,86,.35); }
+    .header-main { max-width: 1440px; margin: auto; padding: 17px 5.5%; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; }
+    .header-left, .header-actions { display: flex; align-items: center; gap: 22px; }
+    .brand { text-align: center; line-height: 1; }
+    .brand-name { font-family: var(--serif); font-size: 34px; letter-spacing: 5px; font-weight: 600; }
+    .brand-tag { display: block; margin-top: 7px; font-size: 8px; letter-spacing: 3px; color: var(--gold); }
+    .icon-btn { border: 0; background: transparent; color: var(--navy); padding: 6px; display: inline-flex; align-items: center; gap: 7px; font-size: 12px; }
+    .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+    .cart-count { background: var(--maroon); color: white; min-width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10px; }
+    .nav { display: flex; justify-content: center; gap: clamp(18px,3.3vw,48px); padding: 0 20px 15px; }
+    .nav a { font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; transition: color .2s; }
+    .nav a:hover { color: var(--gold); }
+    .mobile-menu { display: none; }
+    .hero { max-width: 1600px; margin: auto; padding: 22px 4.5% 0; }
+    .hero-frame { position: relative; min-height: 560px; overflow: hidden; background: #d5c2a7; }
+    .hero-frame > img { position: absolute; inset: 0; height: 100%; object-position: center 35%; }
+    .hero-frame::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(15,35,71,.77),rgba(15,35,71,.24) 56%,rgba(15,35,71,0)); }
+    .hero-copy { position: relative; z-index: 1; max-width: 580px; padding: 110px 7%; color: var(--ivory); }
+    .eyebrow { color: var(--gold); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 700; }
+    h1,h2,h3,p { margin-top: 0; }
+    .hero h1 { font: 500 clamp(42px,6vw,76px)/1.08 var(--serif); margin: 18px 0; }
+    .hero p { max-width: 420px; line-height: 1.8; color: rgba(255,253,248,.9); font-size: 14px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 14px 25px; border: 1px solid var(--gold); background: var(--navy); color: var(--ivory); text-transform: uppercase; letter-spacing: 1.4px; font-size: 10px; font-weight: 700; transition: .25s; }
+    .btn:hover { background: var(--gold); color: var(--navy); }
+    .btn.gold { background: var(--gold); color: var(--navy); }
+    .btn.gold:hover { background: var(--ivory); }
+    .hero-dots { position: absolute; z-index: 2; bottom: 22px; left: 7%; display: flex; gap: 8px; }
+    .hero-dots button { border: 0; width: 22px; height: 3px; padding: 0; background: rgba(255,255,255,.5); }
+    .hero-dots button.active { background: var(--gold); width: 40px; }
+    .benefits { max-width: 1320px; margin: auto; padding: 28px 5%; display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; border-bottom: 1px solid rgba(200,161,86,.35); }
+    .benefit { display: flex; align-items: center; justify-content: center; gap: 12px; text-align: left; }
+    .benefit svg { width: 24px; height: 24px; stroke: var(--gold); fill: none; stroke-width: 1.5; flex: none; }
+    .benefit b { display: block; font: 500 13px var(--serif); }
+    .benefit span { display: block; color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .section { max-width: 1440px; margin: auto; padding: 76px 5.5%; }
+    .section-head { text-align: center; margin-bottom: 34px; }
+    .section-head h2 { font: 500 clamp(30px,4vw,43px) var(--serif); margin: 10px 0; }
+    .section-head p { color: var(--muted); font-size: 13px; line-height: 1.7; margin-bottom: 0; }
+    .categories { display: grid; grid-template-columns: repeat(5,1fr); gap: 17px; }
+    .category-card { position: relative; overflow: hidden; background: var(--beige); min-height: 310px; cursor: pointer; }
+    .category-card img { height: 310px; transition: transform .6s; }
+    .category-card:hover img { transform: scale(1.06); }
+    .category-card::after { content: ""; position: absolute; inset: 35% 0 0; background: linear-gradient(transparent,rgba(15,35,71,.76)); }
+    .category-card span { position: absolute; z-index: 1; bottom: 22px; left: 15px; right: 15px; text-align: center; color: white; font: 500 20px var(--serif); }
+    .shop-section { background: var(--white); }
+    .shop-inner { max-width: 1440px; margin: auto; padding: 76px 5.5%; }
+    .shop-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 25px; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter { border: 1px solid rgba(15,35,71,.2); background: transparent; color: var(--navy); padding: 9px 14px; font-size: 10px; letter-spacing: .6px; }
+    .filter.active,.filter:hover { background: var(--navy); color: var(--ivory); border-color: var(--navy); }
+    .sort-select,.search-input { border: 1px solid rgba(15,35,71,.22); background: transparent; padding: 10px 12px; color: var(--navy); font-size: 11px; outline-color: var(--gold); }
+    .search-input { width: 190px; }
+    .products { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 25px 17px; }
+    .product-card { min-width: 0; }
+    .product-image { position: relative; overflow: hidden; background: var(--beige); aspect-ratio: 3/4; }
+    .product-image img { height: 100%; transition: transform .5s; }
+    .product-card:hover .product-image img { transform: scale(1.045); }
+    .product-badge { position: absolute; top: 12px; left: 12px; background: var(--maroon); color: white; padding: 6px 9px; font-size: 9px; letter-spacing: .7px; text-transform: uppercase; }
+    .quick-add { position: absolute; bottom: 12px; left: 12px; right: 12px; border: 0; padding: 12px; background: rgba(248,244,232,.96); color: var(--navy); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; opacity: 0; transform: translateY(8px); transition: .25s; }
+    .product-card:hover .quick-add { opacity: 1; transform: translateY(0); }
+    .product-info { padding: 13px 2px 0; }
+    .product-category { color: var(--gold); font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase; }
+    .product-info h3 { font: 500 16px var(--serif); margin: 6px 0; }
+    .price { font-size: 12px; font-weight: 700; }
+    .old-price { color: #9a9288; text-decoration: line-through; font-weight: 400; margin-left: 7px; }
+    .empty-state { grid-column: 1/-1; text-align: center; padding: 45px; color: var(--muted); }
+    .story { display: grid; grid-template-columns: 1fr 1fr; background: var(--beige); }
+    .story img { height: 480px; }
+    .story-copy { display: flex; flex-direction: column; justify-content: center; padding: 60px clamp(25px,7vw,100px); }
+    .story-copy h2 { font: 500 clamp(32px,4vw,48px)/1.15 var(--serif); margin: 14px 0; }
+    .story-copy p { color: #5e584f; line-height: 1.9; font-size: 13px; }
+    .story-copy .btn { align-self: flex-start; margin-top: 10px; }
+    .offer { margin: 0 5.5%; padding: 55px 25px; text-align: center; background: var(--maroon); color: var(--ivory); }
+    .offer h2 { font: 500 clamp(29px,4vw,42px) var(--serif); margin: 12px 0; }
+    .offer p { font-size: 12px; color: rgba(248,244,232,.85); }
+    .offer .btn { margin-top: 12px; background: var(--gold); border-color: var(--gold); color: var(--navy); }
+    .newsletter { text-align: center; padding: 65px 20px; }
+    .newsletter h2 { font: 500 32px var(--serif); margin-bottom: 10px; }
+    .newsletter p { color: var(--muted); font-size: 12px; }
+    .newsletter-form { display: flex; max-width: 440px; margin: 22px auto 0; }
+    .newsletter-form input { flex: 1; min-width: 0; border: 1px solid var(--gold); background: transparent; padding: 13px; outline: none; }
+    .newsletter-form button { border: 1px solid var(--navy); background: var(--navy); color: white; padding: 0 18px; font-size: 10px; letter-spacing: 1px; }
+    footer { background: var(--navy); color: var(--ivory); padding: 55px 5.5% 22px; }
+    .footer-grid { max-width: 1320px; margin: auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 35px; }
+    .footer-brand { font: 500 30px var(--serif); letter-spacing: 4px; }
+    footer p,footer a { color: rgba(248,244,232,.72); font-size: 11px; line-height: 2; }
+    footer h4 { color: var(--gold); font: 500 15px var(--serif); margin: 0 0 13px; }
+    .footer-links { display: flex; flex-direction: column; gap: 5px; }
+    .copyright { max-width: 1320px; margin: 35px auto 0; padding-top: 18px; border-top: 1px solid rgba(248,244,232,.2); text-align: center; color: rgba(248,244,232,.55); font-size: 10px; }
+    .whatsapp-float { position: fixed; z-index: 25; right: 22px; bottom: 22px; width: 54px; height: 54px; border-radius: 50%; background: #198c53; color: white; display: grid; place-items: center; box-shadow: 0 8px 25px rgba(0,0,0,.2); }
+    .whatsapp-float svg { width: 27px; height: 27px; fill: currentColor; }
+    .overlay { position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.45); opacity: 0; visibility: hidden; transition: .25s; }
+    .overlay.show { opacity: 1; visibility: visible; }
+    .cart-drawer { position: fixed; z-index: 41; top: 0; right: 0; height: 100%; width: min(440px,100%); background: var(--ivory); transform: translateX(100%); transition: .3s; display: flex; flex-direction: column; }
+    .cart-drawer.open { transform: translateX(0); }
+    .drawer-head { display: flex; justify-content: space-between; align-items: center; padding: 22px; border-bottom: 1px solid var(--beige); }
+    .drawer-head h2 { font: 500 25px var(--serif); margin: 0; }
+    .close-btn { border: 0; background: transparent; color: var(--navy); font-size: 26px; }
+    .cart-items { flex: 1; overflow: auto; padding: 18px 22px; }
+    .cart-item { display: grid; grid-template-columns: 78px 1fr auto; gap: 13px; padding: 13px 0; border-bottom: 1px solid var(--beige); }
+    .cart-item img { height: 100px; background: var(--beige); }
+    .cart-item h4 { font: 500 15px var(--serif); margin: 4px 0 7px; }
+    .cart-item p { font-size: 11px; margin: 0 0 9px; }
+    .qty { display: inline-flex; align-items: center; border: 1px solid var(--beige); }
+    .qty button { border: 0; background: transparent; padding: 4px 9px; color: var(--navy); }
+    .qty span { font-size: 11px; min-width: 18px; text-align: center; }
+    .remove-item { border: 0; background: transparent; color: var(--maroon); font-size: 10px; padding: 4px 0; }
+    .cart-footer { padding: 20px 22px; border-top: 1px solid var(--beige); }
+    .subtotal { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 15px; }
+    .cart-footer .btn { width: 100%; }
+    .cart-note { color: var(--muted); font-size: 10px; line-height: 1.5; margin: 12px 0 0; }
+    .modal { position: fixed; z-index: 50; inset: 0; display: none; place-items: center; padding: 18px; background: rgba(0,0,0,.55); }
+    .modal.show { display: grid; }
+    .modal-card { position: relative; width: min(480px,100%); max-height: 90vh; overflow: auto; background: var(--ivory); padding: 30px; }
+    .modal-card h2 { font: 500 28px var(--serif); margin: 0 0 8px; }
+    .modal-card p { color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .modal-close { position: absolute; right: 15px; top: 12px; border: 0; background: transparent; font-size: 25px; color: var(--navy); }
+    .form-field { display: block; margin: 14px 0; }
+    .form-field span { display: block; font-size: 10px; letter-spacing: .8px; margin-bottom: 6px; text-transform: uppercase; }
+    .form-field input,.form-field textarea { width: 100%; padding: 12px; border: 1px solid var(--beige); background: white; color: var(--navy); outline-color: var(--gold); }
+    .form-field textarea { min-height: 75px; resize: vertical; }
+    .modal-card .btn { width: 100%; }
+    .toast { position: fixed; z-index: 70; left: 50%; bottom: 25px; transform: translate(-50%,20px); opacity: 0; pointer-events: none; background: var(--navy); color: white; padding: 12px 18px; font-size: 12px; transition: .25s; box-shadow: var(--shadow); }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+    /* ---- Enhancements: type, logo, WhatsApp ---- */
+    html { scroll-padding-top: 150px; }
+    body { font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    .brand { display: flex; align-items: center; justify-content: center; gap: 14px; text-align: left; }
+    .brand-logo { width: 64px; height: auto; flex: none; }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { font-size: 38px; font-weight: 600; letter-spacing: 6px; }
+    .brand-tag { font-size: 10px; letter-spacing: 3px; margin-top: 6px; font-weight: 500; }
+    .announcement { font-size: 12px; }
+    .nav a { font-size: 13px; font-weight: 500; }
+    .hero h1 { font-weight: 600; font-size: clamp(48px,6.4vw,88px); line-height: 1.02; }
+    .hero p { font-size: 17px; max-width: 470px; }
+    .eyebrow { font-size: 12px; letter-spacing: 3.2px; }
+    .btn { font-size: 12.5px; padding: 16px 30px; }
+    .benefit b { font-size: 18px; font-weight: 600; }
+    .benefit span { font-size: 12.5px; }
+    .section-head h2, .offer h2 { font-weight: 600; font-size: clamp(36px,4.4vw,54px); }
+    .section-head p { font-size: 15.5px; }
+    .category-card span { font-size: 26px; font-weight: 600; }
+    .filter { font-size: 12.5px; padding: 10px 17px; }
+    .sort-select, .search-input { font-size: 13px; }
+    .product-category { font-size: 11px; }
+    .product-info h3 { font-size: 21px; font-weight: 600; }
+    .price { font-size: 16px; }
+    .quick-add { font-size: 11.5px; }
+    .product-badge { font-size: 10px; }
+    .order-link { display: inline-flex; margin-top: 10px; font-size: 13.5px; font-weight: 600; color: #128C4A; border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+    .story-copy h2 { font-weight: 600; font-size: clamp(38px,4.4vw,58px); }
+    .story-copy p, .offer p { font-size: 15.5px; }
+    .newsletter h2 { font-weight: 600; font-size: 40px; }
+    .newsletter p { font-size: 14.5px; }
+    .footer-brand { font-weight: 600; font-size: 34px; }
+    footer p, footer a { font-size: 14px; }
+    footer h4 { font-size: 20px; font-weight: 600; }
+    .copyright { font-size: 12px; }
+    .footer-logo { width: 104px; height: 104px; border-radius: 50%; background: var(--ivory); display: grid; place-items: center; margin-bottom: 16px; }
+    .footer-logo img { width: 80%; }
+    .drawer-head h2, .modal-card h2 { font-weight: 600; }
+    .whatsapp-float { right: 18px; bottom: 18px; width: auto; height: 58px; padding: 0 22px 0 16px; border-radius: 50px; background: #25D366; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; box-shadow: 0 10px 28px rgba(18,140,74,.4); transition: transform .2s; }
+    .whatsapp-float:hover { transform: translateY(-3px); }
+    .whatsapp-float::before { content: ""; position: absolute; inset: 0; border-radius: inherit; animation: waPulse 2.4s infinite; }
+    @keyframes waPulse { 0% { box-shadow: 0 0 0 0 rgba(37,211,102,.55); } 70%,100% { box-shadow: 0 0 0 16px rgba(37,211,102,0); } }
+    @media (prefers-reduced-motion: reduce) { .whatsapp-float::before { animation: none; } html { scroll-behavior: auto; } }
+    @media (hover: none) { .quick-add { opacity: 1; transform: none; } }
+    @media (max-width: 900px) {
+      .header-main { padding: 14px 4%; }
+      .header-left { gap: 8px; }
+      .header-actions { gap: 10px; }
+      .categories { grid-template-columns: repeat(3,1fr); }
+      .categories .category-card:nth-child(n+4) { display: none; }
+      .products { grid-template-columns: repeat(3,minmax(0,1fr)); }
+      .benefits { grid-template-columns: repeat(2,1fr); row-gap: 22px; }
+      .hero-frame { min-height: 490px; }
+    }
+    @media (max-width: 600px) {
+      .announcement { font-size: 9px; letter-spacing: .8px; }
+      .header-main { grid-template-columns: 40px 1fr 85px; gap: 4px; padding: 12px 4%; }
+      .brand-name { font-size: 27px; letter-spacing: 3px; }
+      .brand-tag { font-size: 7px; letter-spacing: 2px; }
+      .header-left .desktop-search,.header-actions .account-label { display: none; }
+      .header-left { order: 0; }
+      .brand { order: 1; }
+      .header-actions { order: 2; justify-content: flex-end; }
+      .mobile-menu { display: inline-flex; }
+      .nav { display: none; flex-direction: column; align-items: center; padding: 8px 20px 18px; gap: 17px; }
+      .nav.open { display: flex; }
+      .hero { padding: 10px 10px 0; }
+      .hero-frame { min-height: 520px; }
+      .hero-frame > img { object-position: 58% center; }
+      .hero-frame::after { background: linear-gradient(90deg,rgba(15,35,71,.78),rgba(15,35,71,.3)); }
+      .hero-copy { padding: 105px 8% 90px; }
+      .hero h1 { font-size: 47px; }
+      .hero p { font-size: 12px; }
+      .benefits { padding: 22px 4%; gap: 18px 8px; }
+      .benefit { justify-content: flex-start; }
+      .benefit b { font-size: 11px; }
+      .benefit span { font-size: 9px; }
+      .section,.shop-inner { padding: 55px 4%; }
+      .categories { grid-template-columns: repeat(2,1fr); gap: 10px; }
+      .categories .category-card:nth-child(n+4) { display: block; }
+      .category-card,.category-card img { min-height: 0; height: auto; aspect-ratio: 3/4; }
+      .category-card span { font-size: 16px; bottom: 14px; }
+      .products { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 22px 10px; }
+      .quick-add { opacity: 1; transform: none; bottom: 8px; left: 7px; right: 7px; padding: 9px 4px; font-size: 9px; }
+      .product-info h3 { font-size: 14px; }
+      .product-info { padding-top: 9px; }
+      .shop-toolbar { align-items: stretch; }
+      .filters { order: 2; width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+      .filter { white-space: nowrap; }
+      .search-input { flex: 1; width: 100px; }
+      .sort-select { max-width: 135px; }
+      .story { grid-template-columns: 1fr; }
+      .story img { height: 330px; }
+      .story-copy { padding: 38px 8%; }
+      .offer { margin: 0 4%; padding: 42px 18px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px 18px; }
+      .footer-grid > div:first-child { grid-column: 1/-1; }
+      .newsletter { padding: 48px 18px; }
+    }
+    @media (max-width: 600px) {
+      html { scroll-padding-top: 90px; }
+      .brand { gap: 8px; }
+      .brand-logo { width: 42px; }
+      .brand-name { font-size: 23px; letter-spacing: 2.5px; }
+      .brand-tag { display: none; }
+      .hero h1 { font-size: 50px; }
+      .hero p { font-size: 14.5px; }
+      .benefit b { font-size: 14px; }
+      .benefit span { font-size: 11px; }
+      .product-info h3 { font-size: 17px; }
+      .price { font-size: 14px; }
+      .order-link { font-size: 12.5px; }
+      .quick-add { font-size: 10.5px; }
+      .filter { font-size: 12px; }
+      .whatsapp-float { width: 58px; padding: 0; justify-content: center; }
+      .wa-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="announcement">A LITTLE LUXURY, WOVEN FOR YOU &nbsp; | &nbsp; <strong>EXPLORE THE NEW COLLECTION</strong></div>
+
+  <header class="site-header">
+    <div class="header-main">
+      <div class="header-left">
+        <button class="icon-btn mobile-menu" id="menuToggle" aria-label="Open menu">
+          <svg viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+        </button>
+        <button class="icon-btn desktop-search" onclick="document.getElementById('searchBox').focus()" aria-label="Search">
+          <svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+          <span>Search</span>
+        </button>
+      </div>
+      <a class="brand" href="#home" aria-label="WEAVARA home">
+        <img class="brand-logo" src="logo.png" alt="WEAVARA logo">
+        <span class="brand-text"><span class="brand-name">WEAVARA</span><span class="brand-tag">THE ART OF INDIAN DRAPING</span></span>
+      </a>
+      <div class="header-actions">
+        <button class="icon-btn" aria-label="Account" onclick="openWA('Hello WEAVARA! I need help with my account and order status.')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 21c.5-4.1 3.1-6.2 7.5-6.2s7 2.1 7.5 6.2"/></svg>
+          <span class="account-label">Account</span>
+        </button>
+        <button class="icon-btn" id="openCart" aria-label="Open shopping bag">
+          <svg viewBox="0 0 24 24"><path d="M5 8h14l1 13H4L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+    <nav class="nav" id="mainNav">
+      <a href="#home">Home</a><a href="#shop" data-nav-category="All">Shop All</a><a href="#categories">Collections</a>
+      <a href="#shop" data-nav-category="Silk">Silk Sarees</a><a href="#shop" data-nav-category="Wedding">Wedding Edit</a><a href="#story">Our Story</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-frame">
+        <img id="heroImage" src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=2000&q=88" alt="Elegant Indian saree fashion editorial">
+        <div class="hero-copy">
+          <div class="eyebrow">The new season collection</div>
+          <h1>Grace in every<br>weave.</h1>
+          <p>Discover thoughtfully chosen sarees that celebrate the beauty of Indian craftsmanship, timeless traditions and modern elegance.</p>
+          <a class="btn gold" href="#shop">Explore the collection <span>→</span></a>
+        </div>
+        <div class="hero-dots" aria-label="Hero slides">
+          <button class="active" aria-label="Slide 1" data-slide="0"></button>
+          <button aria-label="Slide 2" data-slide="1"></button>
+          <button aria-label="Slide 3" data-slide="2"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="benefits" aria-label="Store benefits">
+      <div class="benefit"><svg viewBox="0 0 24 24"><path d="M3 7h11v11H3zM14 11h4l3 3v4h-7z"/><circle cx="7.5" cy="19" r="1.8"/><circle cx="18" cy="19" r="1.8"/></svg><div><b>Careful Delivery</b><span>Across India</span></div></div>
+      <div class="benefit"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v5c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><div><b>Quality Assured</b><span>Selected with care</span></div></div>
+      <div class="benefit"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 3z"/><path d="M8 9h8M8 13h5"/></svg><div><b>Personal Assistance</b><span>We are here to help</span></div></div>
+      <div class="benefit"><svg viewBox="0 0 24 24"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11Z"/></svg><div><b>Made to Celebrate</b><span>Every special moment</span></div></div>
+    </section>
+
+    <section class="section" id="categories">
+      <div class="section-head"><div class="eyebrow">Find your drape</div><h2>Shop by Collection</h2><p>Explore timeless weaves and beautiful expressions of Indian heritage.</p></div>
+      <div class="categories">
+        <div class="category-card" data-category="Silk"><img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=700&q=85" alt="Silk saree"><span>Silk Sarees</span></div>
+        <div class="category-card" data-category="Banarasi"><img src="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=700&q=85" alt="Banarasi saree"><span>Banarasi</span></div>
+        <div class="category-card" data-category="Cotton"><img src="https://images.unsplash.com/photo-1583391733956-6c78276477e7?auto=format&fit=crop&w=700&q=85" alt="Cotton saree"><span>Everyday Elegance</span></div>
+        <div class="category-card" data-category="Wedding"><img src="https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=700&q=85" alt="Wedding saree"><span>Wedding Edit</span></div>
+        <div class="category-card" data-category="Festive"><img src="https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=700&q=85" alt="Festive saree"><span>Festive Favourites</span></div>
+      </div>
+    </section>
+
+    <section class="shop-section" id="shop">
+      <div class="shop-inner">
+        <div class="section-head"><div class="eyebrow">Curated for you</div><h2>Discover Our Sarees</h2><p>Find the drape that feels like you.</p></div>
+        <div class="shop-toolbar">
+          <div class="filters" id="filters">
+            <button class="filter active" data-filter="All">All Sarees</button>
+            <button class="filter" data-filter="Silk">Silk</button>
+            <button class="filter" data-filter="Banarasi">Banarasi</button>
+            <button class="filter" data-filter="Cotton">Cotton</button>
+            <button class="filter" data-filter="Wedding">Wedding</button>
+            <button class="filter" data-filter="Festive">Festive</button>
+          </div>
+          <div style="display:flex;gap:8px">
+            <input class="search-input" id="searchBox" type="search" placeholder="Search sarees..." aria-label="Search sarees">
+            <select class="sort-select" id="sortSelect" aria-label="Sort products">
+              <option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="products" id="productGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="story" style="padding-top:70px;padding-bottom:70px">
+      <div class="story">
+        <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1100&q=88" alt="Indian textile and saree craftsmanship">
+        <div class="story-copy"><div class="eyebrow">The WEAVARA philosophy</div><h2>Woven with heritage. Chosen for you.</h2><p>At WEAVARA, we believe a saree is more than an ensemble. It carries stories, artistry and moments worth remembering. Our collection is inspired by the richness of Indian textiles and the women who bring every drape to life.</p><a href="#shop" class="btn">Discover WEAVARA</a></div>
+      </div>
+    </section>
+
+    <section class="offer">
+      <div class="eyebrow">A celebration of tradition</div><h2>Make every occasion unforgettable.</h2><p>Explore elegant sarees for weddings, festivities and the everyday moments in between.</p><a href="#shop" class="btn">Shop the edit →</a>
+    </section>
+
+    <section class="newsletter">
+      <div class="eyebrow">Stay in the weave</div><h2>A little note from WEAVARA</h2><p>Get collection updates and styling inspiration. Enter your email to start a WhatsApp enquiry.</p>
+      <form class="newsletter-form" id="newsletterForm"><input type="email" id="newsletterEmail" placeholder="Your email address" required><button type="submit">SUBSCRIBE</button></form>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-grid">
+      <div><div class="footer-logo"><img src="logo.png" alt="WEAVARA logo"></div><div class="footer-brand">WEAVARA</div><p>The art of Indian draping.<br>Timeless sarees, thoughtfully chosen.</p><p>For orders and assistance:<br><a id="footerWhatsApp" href="#" target="_blank" rel="noopener">Chat with us on WhatsApp</a></p></div>
+      <div><h4>Explore</h4><div class="footer-links"><a href="#shop">Shop All</a><a href="#categories">Collections</a><a href="#shop">New Arrivals</a><a href="#shop">Best Sellers</a></div></div>
+      <div><h4>Customer Care</h4><div class="footer-links"><a href="#" data-info="Shipping information">Shipping Information</a><a href="#" data-info="Returns and exchanges">Returns & Exchanges</a><a href="#" data-info="Care guide">Saree Care Guide</a><a href="#" data-info="Contact us">Contact Us</a></div></div>
+      <div><h4>Follow WEAVARA</h4><div class="footer-links"><a href="#" data-info="Instagram link">Instagram</a><a href="#" data-info="Facebook link">Facebook</a><a href="#" data-info="Pinterest link">Pinterest</a></div></div>
+    </div>
+    <div class="copyright">© <span id="year"></span> WEAVARA. All rights reserved.</div>
+  </footer>
+
+  <a class="whatsapp-float" id="floatingWhatsApp" href="https://wa.me/919235949402?text=Hello%20WEAVARA!%20I%20would%20like%20to%20know%20more%20about%20your%20saree%20collection." target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 32 32"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.4 28.6l6.4-1.7A12.7 12.7 0 1 0 16 3.2Zm0 23.1c-2 0-4-.5-5.7-1.6l-.4-.2-3.8 1 1-3.7-.2-.4A10.5 10.5 0 1 1 16 26.3Zm5.8-7.9c-.3-.2-1.8-.9-2.1-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.5 8.5 0 0 1-2.5-1.5 9.3 9.3 0 0 1-1.7-2.1c-.2-.3 0-.5.1-.6l.5-.6c.2-.2.2-.4.3-.6s0-.4 0-.6-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.8 1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.8 5.1 2.1.9 2.9 1 4 .8.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.3-.6-.4Z"/></svg>
+  <span class="wa-label">Chat with us</span></a>
+
+  <div class="overlay" id="overlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+    <div class="drawer-head"><h2>Your Shopping Bag</h2><button class="close-btn" id="closeCart" aria-label="Close cart">×</button></div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer"><div class="subtotal"><span>Subtotal</span><span id="cartSubtotal">₹0</span></div><button class="btn gold" id="checkoutBtn">Checkout on WhatsApp →</button><p class="cart-note">Your order details will open in WhatsApp for confirmation. Delivery charges and final availability will be confirmed by our team.</p></div>
+  </aside>
+
+  <div class="modal" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+    <div class="modal-card">
+      <button class="modal-close" id="closeModal" aria-label="Close">×</button>
+      <div class="eyebrow">Almost yours</div><h2 id="checkoutTitle">Complete your order</h2><p>Share your details. We will open WhatsApp with your selected sarees and order summary.</p>
+      <form id="checkoutForm">
+        <label class="form-field"><span>Your name *</span><input id="customerName" required autocomplete="name" placeholder="Enter your full name"></label>
+        <label class="form-field"><span>Mobile number *</span><input id="customerPhone" required inputmode="tel" autocomplete="tel" pattern="[0-9+ ()-]{8,18}" placeholder="Your contact number"></label>
+        <label class="form-field"><span>Delivery address *</span><textarea id="customerAddress" required autocomplete="street-address" placeholder="House, street, city, PIN code"></textarea></label>
+        <label class="form-field"><span>Notes (optional)</span><input id="customerNotes" placeholder="Preferred colour, blouse details, etc."></label>
+        <button class="btn gold" type="submit">Send order on WhatsApp →</button>
+      </form>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    // WEAVARA store configuration
+    // WhatsApp destination is assumed to be India (+91) from the supplied 10-digit number.
+    const WHATSAPP_NUMBER = "919235949402";
+
+    // Replace these sample products, prices and photographs with your actual catalogue before accepting orders.
+    const products = [
+      {id:1,name:"Royal Banarasi Silk Saree",category:"Banarasi",price:5499,oldPrice:6999,badge:"Bestseller",image:"https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=850&q=85"},
+      {id:2,name:"Blush Kanjivaram Silk",category:"Silk",price:7299,oldPrice:8999,badge:"New",image:"https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=850&q=85"},
+      {id:3,name:"Ivory Floral Cotton Saree",category:"Cotton",price:1899,oldPrice:2399,badge:"Everyday",image:"https://images.unsplash.com/photo-1583391733956-6c78276477e7?auto=format&fit=crop&w=850&q=85"},
+      {id:4,name:"Maroon Wedding Silk Saree",category:"Wedding",price:8999,oldPrice:10999,badge:"Wedding edit",image:"https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=850&q=85"},
+      {id:5,name:"Golden Zari Festive Saree",category:"Festive",price:4299,oldPrice:4999,badge:"Festive",image:"https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=850&q=85"},
+      {id:6,name:"Classic Handloom Silk Saree",category:"Silk",price:6299,oldPrice:7499,badge:"Handpicked",image:"https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=850&q=85"},
+      {id:7,name:"Traditional Banarasi Brocade",category:"Banarasi",price:6799,oldPrice:7999,badge:"Popular",image:"https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=850&q=85"},
+      {id:8,name:"Soft Cotton Printed Saree",category:"Cotton",price:1599,oldPrice:1999,badge:"Light & easy",image:"https://images.unsplash.com/photo-1583391733956-6c78276477e7?auto=format&fit=crop&w=850&q=85"}
+    ];
+
+    let activeCategory = "All";
+    let cart = [];
+    const money = n => "₹" + Number(n).toLocaleString("en-IN");
+    const grid = document.getElementById("productGrid");
+    const cartDrawer = document.getElementById("cartDrawer");
+    const overlay = document.getElementById("overlay");
+    const modal = document.getElementById("checkoutModal");
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    function renderProducts() {
+      const query = document.getElementById("searchBox").value.trim().toLowerCase();
+      const sort = document.getElementById("sortSelect").value;
+      let list = products.filter(p => (activeCategory === "All" || p.category === activeCategory) &&
+        (p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)));
+      if (sort === "low") list.sort((a,b) => a.price-b.price);
+      if (sort === "high") list.sort((a,b) => b.price-a.price);
+      grid.innerHTML = list.length ? list.map(p => `
+        <article class="product-card">
+          <div class="product-image">
+            <img src="${p.image}" alt="${p.name}" loading="lazy">
+            <span class="product-badge">${p.badge}</span>
+            <button class="quick-add" onclick="addToCart(${p.id})">Add to bag +</button>
+          </div>
+          <div class="product-info">
+            <div class="product-category">${p.category}</div>
+            <h3>${p.name}</h3>
+            <div class="price">${money(p.price)} <span class="old-price">${money(p.oldPrice)}</span></div>
+            <a class="order-link" href="${whatsappLink(`Hello WEAVARA! I am interested in ${p.name} (${money(p.price)}). Please share details.`)}" target="_blank" rel="noopener">Order on WhatsApp</a>
+          </div>
+        </article>`).join("") : `<div class="empty-state">No sarees found. Try another search or category.</div>`;
+    }
+
+    function setCategory(category) {
+      activeCategory = category;
+      document.querySelectorAll(".filter").forEach(btn => btn.classList.toggle("active", btn.dataset.filter === category));
+      renderProducts();
+      document.getElementById("shop").scrollIntoView({behavior:"smooth"});
+    }
+
+    function addToCart(id) {
+      const item = cart.find(x => x.id === id);
+      if (item) item.qty++;
+      else cart.push({id,qty:1});
+      renderCart();
+      showToast("Added to your shopping bag");
+    }
+
+    function changeQty(id,delta) {
+      const item = cart.find(x => x.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+      renderCart();
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(x => x.id !== id);
+      renderCart();
+    }
+
+    function cartTotal() {
+      return cart.reduce((sum,item) => sum + products.find(p => p.id === item.id).price * item.qty,0);
+    }
+
+    function renderCart() {
+      const count = cart.reduce((sum,item) => sum + item.qty,0);
+      document.getElementById("cartCount").textContent = count;
+      document.getElementById("cartSubtotal").textContent = money(cartTotal());
+      const items = document.getElementById("cartItems");
+      if (!cart.length) {
+        items.innerHTML = '<div class="empty-state">Your shopping bag is waiting for something beautiful.<br><br><a href="#shop" class="btn" id="continueShopping">Explore sarees</a></div>';
+        document.getElementById("checkoutBtn").disabled = true;
+        document.getElementById("checkoutBtn").style.opacity = ".5";
+        const continueLink = document.getElementById("continueShopping");
+        if (continueLink) continueLink.addEventListener("click",closeCart);
+        return;
+      }
+      document.getElementById("checkoutBtn").disabled = false;
+      document.getElementById("checkoutBtn").style.opacity = "1";
+      items.innerHTML = cart.map(item => {
+        const p = products.find(x => x.id === item.id);
+        return `<div class="cart-item">
+          <img src="${p.image}" alt="${p.name}">
+          <div><h4>${p.name}</h4><p>${money(p.price)}</p>
+            <div class="qty"><button aria-label="Decrease quantity" onclick="changeQty(${p.id},-1)">−</button><span>${item.qty}</span><button aria-label="Increase quantity" onclick="changeQty(${p.id},1)">+</button></div>
+          </div>
+          <button class="remove-item" onclick="removeFromCart(${p.id})">Remove</button>
+        </div>`;
+      }).join("");
+    }
+
+    function openCart() {
+      cartDrawer.classList.add("open"); overlay.classList.add("show"); document.body.classList.add("locked");
+    }
+    function closeCart() {
+      cartDrawer.classList.remove("open"); overlay.classList.remove("show"); document.body.classList.remove("locked");
+    }
+    function openCheckout() {
+      if (!cart.length) return;
+      closeCart(); modal.classList.add("show"); document.body.classList.add("locked");
+    }
+    function closeCheckout() {
+      modal.classList.remove("show"); document.body.classList.remove("locked");
+    }
+
+    document.getElementById("filters").addEventListener("click",e => {
+      const btn = e.target.closest("[data-filter]");
+      if (btn) setCategory(btn.dataset.filter);
+    });
+    document.querySelectorAll(".category-card").forEach(card => card.addEventListener("click",() => setCategory(card.dataset.category)));
+    document.querySelectorAll("[data-nav-category]").forEach(link => link.addEventListener("click",() => {
+      activeCategory = link.dataset.navCategory;
+      document.querySelectorAll(".filter").forEach(btn => btn.classList.toggle("active",btn.dataset.filter === activeCategory));
+      renderProducts();
+      document.getElementById("mainNav").classList.remove("open");
+    }));
+    document.getElementById("searchBox").addEventListener("input",renderProducts);
+    document.getElementById("sortSelect").addEventListener("change",renderProducts);
+    document.getElementById("openCart").addEventListener("click",openCart);
+    document.getElementById("closeCart").addEventListener("click",closeCart);
+    document.getElementById("checkoutBtn").addEventListener("click",openCheckout);
+    document.getElementById("closeModal").addEventListener("click",closeCheckout);
+    overlay.addEventListener("click",closeCart);
+    modal.addEventListener("click",e => { if(e.target === modal) closeCheckout(); });
+    document.getElementById("menuToggle").addEventListener("click",() => document.getElementById("mainNav").classList.toggle("open"));
+
+    document.getElementById("checkoutForm").addEventListener("submit",e => {
+      e.preventDefault();
+      if (!cart.length) return;
+      const name = document.getElementById("customerName").value.trim();
+      const phone = document.getElementById("customerPhone").value.trim();
+      const address = document.getElementById("customerAddress").value.trim();
+      const notes = document.getElementById("customerNotes").value.trim();
+      const lines = cart.map(item => {
+        const p = products.find(x => x.id === item.id);
+        return `• ${p.name} | Qty: ${item.qty} | ${money(p.price * item.qty)}`;
+      }).join("\n");
+      const message = `Hello WEAVARA! I would like to place an order.\n\nName: ${name}\nCustomer phone: ${phone}\nDelivery address: ${address}\n\nOrder:\n${lines}\n\nSubtotal: ${money(cartTotal())}\nNotes: ${notes || "None"}\n\nPlease confirm availability, delivery charges and payment details.`;
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      openLink(url);
+      closeCheckout();
+    });
+
+    function whatsappLink(message) {
+      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    }
+    function openLink(url) {
+      const w = window.open(url,"_blank");
+      if (w) w.opener = null; else location.href = url;
+    }
+    function openWA(message) { openLink(whatsappLink(message)); }
+    document.getElementById("floatingWhatsApp").href = whatsappLink("Hello WEAVARA! I would like to know more about your saree collection.");
+    document.getElementById("footerWhatsApp").href = whatsappLink("Hello WEAVARA! I need help with an order.");
+    document.getElementById("newsletterForm").addEventListener("submit",e => {
+      e.preventDefault();
+      const email = document.getElementById("newsletterEmail").value.trim();
+      openWA(`Hello WEAVARA! Please share collection updates. My email is ${email}.`);
+      e.target.reset();
+    });
+    document.querySelectorAll("[data-info]").forEach(link => link.addEventListener("click",e => {
+      e.preventDefault(); openWA(`Hello WEAVARA! Please help me with: ${link.dataset.info}.`);
+    }));
+
+    const slides = [
+      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=2000&q=88",
+      "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=2000&q=88",
+      "https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=2000&q=88"
+    ];
+    let slideIndex = 0;
+    function showSlide(index) {
+      slideIndex = index;
+      document.getElementById("heroImage").src = slides[index];
+      document.querySelectorAll(".hero-dots button").forEach((dot,i) => dot.classList.toggle("active",i === index));
+    }
+    document.querySelectorAll(".hero-dots button").forEach(dot => dot.addEventListener("click",() => showSlide(Number(dot.dataset.slide))));
+    setInterval(() => showSlide((slideIndex + 1) % slides.length),5000);
+
+    function sareeArt(n) {
+      const P = [["#8C1C3B","#5B0F27"],["#0F2347","#1D3F7A"],["#6B1E2E","#3D0F1A"],["#7A8F63","#4A5C3A"],["#C8A156","#8F6A22"]][n % 5];
+      let pleats = ""; for (let x = 70; x <= 230; x += 20) pleats += `<path d='M${x} 0L${x*1.1-15} 326'/>`;
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${P[0]}'/><stop offset='1' stop-color='${P[1]}'/></linearGradient><pattern id='z' width='16' height='16' patternUnits='userSpaceOnUse'><circle cx='8' cy='8' r='2.4' fill='#C8A156'/></pattern></defs><rect width='300' height='400' fill='#E7D9C8'/><path d='M40 0h220l30 400H10z' fill='url(#g)'/><g stroke='#000' stroke-opacity='.16' stroke-width='2'>${pleats}</g><rect x='10' y='326' width='280' height='52' fill='#0F2347'/><rect x='10' y='330' width='280' height='44' fill='url(#z)'/><rect x='10' y='324' width='280' height='4' fill='#C8A156'/><rect x='10' y='376' width='280' height='4' fill='#C8A156'/></svg>`;
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+    function fixImg(t) {
+      if (t.dataset.fb || /logo\.png$/.test(t.getAttribute("src") || "")) return;
+      t.dataset.fb = "1";
+      t.src = sareeArt([...(t.alt || "x")].reduce((s,c) => s + c.charCodeAt(0),0));
+    }
+    window.addEventListener("error",e => { if (e.target && e.target.tagName === "IMG") fixImg(e.target); },true);
+    document.querySelectorAll("img").forEach(i => { if (i.complete && !i.naturalWidth && i.getAttribute("src")) fixImg(i); });
+    document.querySelectorAll("#mainNav a").forEach(a => a.addEventListener("click",() => document.getElementById("mainNav").classList.remove("open")));
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    renderProducts();
+    renderCart();
+  </script>
+</body>
+</html>
