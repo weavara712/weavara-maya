@@ -26,7 +26,8 @@ button{cursor:pointer}
 .btn.danger{background:var(--maroon);border-color:var(--maroon)}
 .login{max-width:420px;margin:12vh auto;background:#fff;border:1px solid var(--beige);border-top:4px solid var(--gold);padding:28px}
 .login h2{font-size:32px;margin-bottom:8px}
-.login input{width:100%;height:46px;border:1px solid var(--gold);padding:0 12px;margin:12px 0;background:var(--ivory)}
+.login label{display:block;margin-top:6px}
+.login input{width:100%;height:46px;border:1px solid var(--gold);padding:0 12px;margin:6px 0 14px;background:var(--ivory)}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
 .stat{background:#fff;border:1px solid var(--beige);border-top:3px solid var(--gold);padding:14px 16px}
 .stat b{display:block;font-family:var(--serif);font-size:36px;line-height:1.1}
@@ -59,13 +60,17 @@ td .u{display:block;max-width:300px;word-break:break-all;font-size:12px}
 <script>
 (function(){
 'use strict';
-/* ========= CONFIG: must match index.html ========= */
+/* ========= CONFIG ========= */
 var CFG = {
+  /* ---- ADMIN LOGIN: change these two lines ---- */
+  USER: 'maya',             // admin username
+  PASS: 'admin',            // admin password
+  /* --------------------------------------------- */
   API: '',                  // Google Apps Script web app URL (same as in index.html). Leave '' for demo mode.
   WA_PREFIX: '91'           // country code used for "Open chat" buttons
 };
 var STATUSES=['New','Contacted','Confirmed','Paid','Dispatched','Delivered','Cancelled'];
-var KEY='weavara_bookings', META='weavara_admin_status';
+var KEY='weavara_bookings', META='weavara_admin_status', SESSION='weavara_admin_ok';
 var state={rows:[],key:'',filter:'',type:'all',status:'all',authed:false,error:''};
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -77,7 +82,7 @@ function loadLocal(){ var a=[]; try{a=JSON.parse(get(KEY)||'[]');}catch(e){} var
 function load(cb){
   if(!CFG.API){ state.rows=loadLocal(); return cb(true); }
   fetch(CFG.API+(CFG.API.indexOf('?')>-1?'&':'?')+'action=list&key='+encodeURIComponent(state.key)).then(function(r){return r.json();}).then(function(j){
-    if(!j||!j.ok){ state.error='Wrong admin key.'; return cb(false); }
+    if(!j||!j.ok){ state.error='Wrong username or password.'; return cb(false); }
     state.rows=j.rows||[]; cb(true);
   }).catch(function(){ state.error='Could not reach the server. Check the API URL and that the web app is deployed for "Anyone".'; cb(false); });
 }
@@ -91,12 +96,33 @@ function removeRow(id){
   if(!CFG.API){ var a=[]; try{a=JSON.parse(get(KEY)||'[]');}catch(e){} set(KEY,JSON.stringify(a.filter(function(r){return r.id!==id;}))); }
 }
 
-/* ========= VIEW ========= */
+/* ========= LOGIN ========= */
 function login(){
-  $('app').innerHTML='<div class="login"><h2>Weavara Admin</h2><p class="muted">'+(CFG.API?'Enter your admin key.':'Demo mode: showing bookings saved in this browser only. To see bookings from all customers, set up the backend (see weavara-backend.gs) and add its URL in both files.')+'</p>'+
-  '<form id="lf"><label for="k" class="muted">Admin key</label><input id="k" type="password" autocomplete="current-password" '+(CFG.API?'required':'')+'>'+(state.error?'<p style="color:var(--maroon)" role="alert">'+esc(state.error)+'</p>':'')+'<button class="btn" type="submit" style="width:100%">Open dashboard</button></form></div>';
-  $('lf').onsubmit=function(e){ e.preventDefault(); state.key=$('k').value; load(function(ok){ if(ok){state.authed=true;state.error='';render();}else login(); }); };
+  $('app').innerHTML='<div class="login"><h2>Weavara Admin</h2><p class="muted">Sign in to open the dashboard.</p>'+
+  '<form id="lf"><label for="u" class="muted">Username</label><input id="u" type="text" autocomplete="username" autocapitalize="none" required>'+
+  '<label for="k" class="muted">Password</label><input id="k" type="password" autocomplete="current-password" required>'+
+  (state.error?'<p style="color:var(--maroon)" role="alert">'+esc(state.error)+'</p>':'')+
+  '<button class="btn" type="submit" style="width:100%">Sign in</button></form></div>';
+  $('lf').onsubmit=function(e){
+    e.preventDefault();
+    var u=$('u').value.trim(), p=$('k').value;
+    if(!CFG.API){
+      if(u===CFG.USER && p===CFG.PASS){
+        try{sessionStorage.setItem(SESSION,'1');}catch(x){}
+        state.error=''; state.authed=true; state.rows=loadLocal(); render();
+      } else { state.error='Wrong username or password.'; login(); }
+      return;
+    }
+    state.key=p;
+    load(function(ok){ if(ok){state.authed=true;state.error='';render();}else login(); });
+  };
 }
+function logout(){
+  try{sessionStorage.removeItem(SESSION);}catch(e){}
+  state.authed=false; state.key=''; state.error=''; login();
+}
+
+/* ========= VIEW ========= */
 function inRange(ts,days){ return (Date.now()-new Date(ts).getTime())<days*864e5; }
 function sourceTable(rows){
   var m={}; rows.filter(function(r){return r.type!=='whatsapp_click';}).forEach(function(r){ var u=r.bookedFromUrl||'(unknown)'; m[u]=(m[u]||0)+1; });
@@ -121,7 +147,7 @@ function render(){
   var rev=bk.filter(function(r){return r.type==='order'&&r.price&&r.status!=='Cancelled';}).reduce(function(s,r){return s+(+r.price||0);},0);
   var list=filtered();
   $('app').innerHTML=
-  '<div class="top"><div><h1>WEAVARA ADMIN</h1><small>Bookings, orders and WhatsApp redirects</small></div><div class="row"><span class="mode">'+(CFG.API?'Live: Google Sheet backend':'Demo: this browser only')+'</span><button class="btn ghost sm" id="rf" type="button">Refresh</button><button class="btn ghost sm" id="csv" type="button">Export CSV</button></div></div>'+
+  '<div class="top"><div><h1>WEAVARA ADMIN</h1><small>Bookings, orders and WhatsApp redirects</small></div><div class="row"><span class="mode">'+(CFG.API?'Live: Google Sheet backend':'Demo: this browser only')+'</span><button class="btn ghost sm" id="rf" type="button">Refresh</button><button class="btn ghost sm" id="csv" type="button">Export CSV</button><button class="btn ghost sm" id="lo" type="button">Logout</button></div></div>'+
   '<div class="wrap">'+
   '<div class="stats"><div class="stat"><b>'+bk.length+'</b><span>Total bookings</span></div><div class="stat"><b>'+bk.filter(function(r){return inRange(r.ts,1);}).length+'</b><span>Last 24 hours</span></div><div class="stat"><b>'+bk.filter(function(r){return r.type==='order';}).length+'</b><span>Saree orders</span></div><div class="stat"><b>'+bk.filter(function(r){return r.type==='consultation';}).length+'</b><span>Consultations</span></div><div class="stat"><b>'+rows.filter(function(r){return r.type==='whatsapp_click';}).length+'</b><span>WhatsApp button taps</span></div><div class="stat"><b>₹'+rev.toLocaleString('en-IN')+'</b><span>Order value (open + won)</span></div></div>'+
   '<div class="panel"><h2>Where bookings came from (page URL)</h2>'+sourceTable(rows)+'</div>'+
@@ -130,6 +156,7 @@ function render(){
   $('ft').value=state.type; $('fs').value=state.status;
   $('rf').onclick=function(){ load(function(){render();}); };
   $('csv').onclick=exportCsv;
+  $('lo').onclick=logout;
   $('q').oninput=function(e){ state.filter=e.target.value; var pos=e.target.selectionStart; render(); var q=$('q'); q.focus(); q.setSelectionRange(pos,pos); };
   $('ft').onchange=function(e){state.type=e.target.value;render();};
   $('fs').onchange=function(e){state.status=e.target.value;render();};
@@ -152,10 +179,13 @@ function rowHtml(r){
 function exportCsv(){
   var cols=['id','ts','type','name','phone','address','pincode','note','productId','productName','price','collection','bookedFromUrl','entryUrl','referrer','utm','lang','whatsapp','status'];
   var out=[cols.join(',')].concat(filtered().map(function(r){return cols.map(function(c){return '"'+String(r[c]==null?'':r[c]).replace(/"/g,'""')+'"';}).join(',');}));
-  var blob=new Blob(['﻿'+out.join('\n')],{type:'text/csv;charset=utf-8'}), a=document.createElement('a');
+  var blob=new Blob(['\ufeff'+out.join('\n')],{type:'text/csv;charset=utf-8'}), a=document.createElement('a');
   a.href=URL.createObjectURL(blob); a.download='weavara-bookings.csv'; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
 }
-login();
+
+/* ========= START ========= */
+var ok=false; try{ok=sessionStorage.getItem(SESSION)==='1';}catch(e){}
+if(ok&&!CFG.API){ state.authed=true; state.rows=loadLocal(); render(); } else login();
 })();
 </script>
 </body>
