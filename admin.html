@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Weavara Admin</title>
+<style>
+:root{--navy:#0F2747;--gold:#CDA45F;--ivory:#F9F5EA;--beige:#E8D7BE;--maroon:#6B1F2B;--sage:#7A8F63;--sans:'Jost',system-ui,-apple-system,'Segoe UI',sans-serif;--serif:'Cormorant Garamond',Georgia,serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ivory);color:var(--navy);font-family:var(--sans);font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:var(--serif);font-weight:600;margin:0}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--maroon);outline-offset:2px}
+.top{background:var(--navy);color:var(--ivory);padding:14px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.top h1{font-size:28px;letter-spacing:.2em}
+.top small{color:var(--beige)}
+.wrap{max-width:1400px;margin:0 auto;padding:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:1px solid var(--navy);background:var(--navy);color:var(--ivory);font-size:13px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.btn:hover{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.btn.ghost{background:var(--ivory);color:var(--navy);border-color:var(--gold)}
+.btn.ghost:hover{background:var(--beige)}
+.btn.sm{min-height:32px;padding:0 10px;font-size:12px}
+.btn.wa{background:#25D366;border-color:#25D366;color:#fff}
+.btn.danger{background:var(--maroon);border-color:var(--maroon)}
+.login{max-width:420px;margin:12vh auto;background:#fff;border:1px solid var(--beige);border-top:4px solid var(--gold);padding:28px}
+.login h2{font-size:32px;margin-bottom:8px}
+.login input{width:100%;height:46px;border:1px solid var(--gold);padding:0 12px;margin:12px 0;background:var(--ivory)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:#fff;border:1px solid var(--beige);border-top:3px solid var(--gold);padding:14px 16px}
+.stat b{display:block;font-family:var(--serif);font-size:36px;line-height:1.1}
+.stat span{font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.panel{background:#fff;border:1px solid var(--beige);padding:16px;margin-bottom:20px}
+.panel h2{font-size:24px;margin-bottom:10px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.row input,.row select{height:40px;border:1px solid var(--gold);background:var(--ivory);padding:0 10px}
+.row input{flex:1 1 220px;min-width:0}
+.tw{overflow-x:auto;border:1px solid var(--beige)}
+table{border-collapse:collapse;width:100%;min-width:1000px;background:#fff}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--beige);font-size:14px}
+th{background:var(--beige);font-size:12px;letter-spacing:.08em;text-transform:uppercase;position:sticky;top:0}
+td .u{display:block;max-width:300px;word-break:break-all;font-size:12px}
+.tag{display:inline-block;padding:2px 8px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;background:var(--beige)}
+.tag.order{background:var(--navy);color:var(--ivory)}
+.tag.consultation{background:var(--maroon);color:var(--ivory)}
+.tag.whatsapp_click{background:#25D366;color:#fff}
+.src{display:flex;flex-direction:column;gap:6px}
+.src div{display:flex;align-items:center;gap:10px}
+.src .bar{height:10px;background:var(--gold);min-width:4px}
+.src code{font-size:12px;word-break:break-all}
+.mode{font-size:13px;background:var(--beige);color:var(--navy);padding:6px 12px}
+.muted{color:#5b6b82}
+.empty{padding:40px;text-align:center}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+'use strict';
+/* ========= CONFIG: must match index.html ========= */
+var CFG = {
+  API: '',                  // Google Apps Script web app URL (same as in index.html). Leave '' for demo mode.
+  WA_PREFIX: '91'           // country code used for "Open chat" buttons
+};
+var STATUSES=['New','Contacted','Confirmed','Paid','Dispatched','Delivered','Cancelled'];
+var KEY='weavara_bookings', META='weavara_admin_status';
+var state={rows:[],key:'',filter:'',type:'all',status:'all',authed:false,error:''};
+var $=function(id){return document.getElementById(id);};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+
+/* ========= DATA ========= */
+function loadLocal(){ var a=[]; try{a=JSON.parse(get(KEY)||'[]');}catch(e){} var m={}; try{m=JSON.parse(get(META)||'{}');}catch(e){} a.forEach(function(r){ if(m[r.id]) r.status=m[r.id]; }); return a; }
+function load(cb){
+  if(!CFG.API){ state.rows=loadLocal(); return cb(true); }
+  fetch(CFG.API+(CFG.API.indexOf('?')>-1?'&':'?')+'action=list&key='+encodeURIComponent(state.key)).then(function(r){return r.json();}).then(function(j){
+    if(!j||!j.ok){ state.error='Wrong admin key.'; return cb(false); }
+    state.rows=j.rows||[]; cb(true);
+  }).catch(function(){ state.error='Could not reach the server. Check the API URL and that the web app is deployed for "Anyone".'; cb(false); });
+}
+function setStatus(id,st){
+  state.rows.forEach(function(r){ if(r.id===id) r.status=st; });
+  if(CFG.API){ try{ fetch(CFG.API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update',key:state.key,id:id,status:st})}); }catch(e){} }
+  var m={}; try{m=JSON.parse(get(META)||'{}');}catch(e){} m[id]=st; set(META,JSON.stringify(m));
+}
+function removeRow(id){
+  state.rows=state.rows.filter(function(r){return r.id!==id;});
+  if(!CFG.API){ var a=[]; try{a=JSON.parse(get(KEY)||'[]');}catch(e){} set(KEY,JSON.stringify(a.filter(function(r){return r.id!==id;}))); }
+}
+
+/* ========= VIEW ========= */
+function login(){
+  $('app').innerHTML='<div class="login"><h2>Weavara Admin</h2><p class="muted">'+(CFG.API?'Enter your admin key.':'Demo mode: showing bookings saved in this browser only. To see bookings from all customers, set up the backend (see weavara-backend.gs) and add its URL in both files.')+'</p>'+
+  '<form id="lf"><label for="k" class="muted">Admin key</label><input id="k" type="password" autocomplete="current-password" '+(CFG.API?'required':'')+'>'+(state.error?'<p style="color:var(--maroon)" role="alert">'+esc(state.error)+'</p>':'')+'<button class="btn" type="submit" style="width:100%">Open dashboard</button></form></div>';
+  $('lf').onsubmit=function(e){ e.preventDefault(); state.key=$('k').value; load(function(ok){ if(ok){state.authed=true;state.error='';render();}else login(); }); };
+}
+function inRange(ts,days){ return (Date.now()-new Date(ts).getTime())<days*864e5; }
+function sourceTable(rows){
+  var m={}; rows.filter(function(r){return r.type!=='whatsapp_click';}).forEach(function(r){ var u=r.bookedFromUrl||'(unknown)'; m[u]=(m[u]||0)+1; });
+  var a=Object.keys(m).map(function(k){return [k,m[k]];}).sort(function(x,y){return y[1]-x[1];}).slice(0,8);
+  if(!a.length) return '<p class="muted">No bookings yet.</p>';
+  var max=a[0][1];
+  return '<div class="src">'+a.map(function(x){return '<div><span class="bar" style="width:'+Math.max(6,Math.round(x[1]/max*220))+'px"></span><b>'+x[1]+'</b><code>'+esc(x[0])+'</code></div>';}).join('')+'</div>';
+}
+function fmt(ts){ var d=new Date(ts); return isNaN(d)?esc(ts):d.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function waChat(r){ var ph=String(r.phone||'').replace(/\D/g,''); if(ph.length===10) ph=CFG.WA_PREFIX+ph; return 'https://wa.me/'+ph+'?text='+encodeURIComponent('Hello '+(r.name||'')+', this is Weavara regarding your '+(r.type==='order'?'order '+(r.productName||''):'enquiry')+' (Ref '+r.id+').'); }
+function filtered(){
+  var q=state.filter.toLowerCase();
+  return state.rows.filter(function(r){
+    if(state.type!=='all'&&r.type!==state.type) return false;
+    if(state.status!=='all'&&r.status!==state.status) return false;
+    if(q&&JSON.stringify(r).toLowerCase().indexOf(q)<0) return false;
+    return true;
+  }).sort(function(a,b){return String(b.ts).localeCompare(String(a.ts));});
+}
+function render(){
+  var rows=state.rows, bk=rows.filter(function(r){return r.type!=='whatsapp_click';});
+  var rev=bk.filter(function(r){return r.type==='order'&&r.price&&r.status!=='Cancelled';}).reduce(function(s,r){return s+(+r.price||0);},0);
+  var list=filtered();
+  $('app').innerHTML=
+  '<div class="top"><div><h1>WEAVARA ADMIN</h1><small>Bookings, orders and WhatsApp redirects</small></div><div class="row"><span class="mode">'+(CFG.API?'Live: Google Sheet backend':'Demo: this browser only')+'</span><button class="btn ghost sm" id="rf" type="button">Refresh</button><button class="btn ghost sm" id="csv" type="button">Export CSV</button></div></div>'+
+  '<div class="wrap">'+
+  '<div class="stats"><div class="stat"><b>'+bk.length+'</b><span>Total bookings</span></div><div class="stat"><b>'+bk.filter(function(r){return inRange(r.ts,1);}).length+'</b><span>Last 24 hours</span></div><div class="stat"><b>'+bk.filter(function(r){return r.type==='order';}).length+'</b><span>Saree orders</span></div><div class="stat"><b>'+bk.filter(function(r){return r.type==='consultation';}).length+'</b><span>Consultations</span></div><div class="stat"><b>'+rows.filter(function(r){return r.type==='whatsapp_click';}).length+'</b><span>WhatsApp button taps</span></div><div class="stat"><b>₹'+rev.toLocaleString('en-IN')+'</b><span>Order value (open + won)</span></div></div>'+
+  '<div class="panel"><h2>Where bookings came from (page URL)</h2>'+sourceTable(rows)+'</div>'+
+  '<div class="panel"><h2>All activity</h2><div class="row" style="margin-bottom:12px"><input id="q" type="search" placeholder="Search name, phone, pincode, saree, URL" value="'+esc(state.filter)+'" aria-label="Search"><select id="ft" aria-label="Type"><option value="all">All types</option><option value="order">Orders</option><option value="consultation">Consultations</option><option value="whatsapp_click">WhatsApp taps</option></select><select id="fs" aria-label="Status"><option value="all">All statuses</option>'+STATUSES.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
+  (list.length?'<div class="tw"><table><thead><tr><th>Time</th><th>Type</th><th>Customer</th><th>Address</th><th>Saree</th><th>Booked from page (URL)</th><th>Landing URL / referrer</th><th>WhatsApp</th><th>Status</th><th></th></tr></thead><tbody>'+list.map(rowHtml).join('')+'</tbody></table></div>':'<div class="empty muted">No records match. Place a test order on the website and refresh.</div>')+'</div></div>';
+  $('ft').value=state.type; $('fs').value=state.status;
+  $('rf').onclick=function(){ load(function(){render();}); };
+  $('csv').onclick=exportCsv;
+  $('q').oninput=function(e){ state.filter=e.target.value; var pos=e.target.selectionStart; render(); var q=$('q'); q.focus(); q.setSelectionRange(pos,pos); };
+  $('ft').onchange=function(e){state.type=e.target.value;render();};
+  $('fs').onchange=function(e){state.status=e.target.value;render();};
+  Array.prototype.forEach.call(document.querySelectorAll('[data-st]'),function(el){ el.onchange=function(){ setStatus(el.getAttribute('data-st'),el.value); }; });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-del]'),function(el){ el.onclick=function(){ if(el.getAttribute('data-sure')){ removeRow(el.getAttribute('data-del')); render(); } else { el.setAttribute('data-sure','1'); el.textContent='Sure?'; } }; });
+}
+function rowHtml(r){
+  var isClick=r.type==='whatsapp_click';
+  return '<tr><td>'+fmt(r.ts)+'<br><span class="muted" style="font-size:12px">'+esc(r.id)+'</span></td>'+
+   '<td><span class="tag '+esc(r.type)+'">'+esc(String(r.type).replace('_',' '))+'</span><br><span class="muted" style="font-size:12px">'+esc(r.lang==='hi'?'Hindi':'English')+'</span></td>'+
+   '<td>'+(isClick?'<span class="muted">Visitor tapped the floating WhatsApp button</span>':'<b>'+esc(r.name)+'</b><br>'+esc(r.phone)+(r.note?'<br><span class="muted">“'+esc(r.note)+'”</span>':''))+'</td>'+
+   '<td>'+(isClick?'':esc(r.address)+'<br>PIN '+esc(r.pincode))+'</td>'+
+   '<td>'+(r.productName?esc(r.productName)+'<br><span class="muted">'+esc(r.productId)+' · ₹'+(+r.price||0).toLocaleString('en-IN')+'</span>':'<span class="muted">-</span>')+'</td>'+
+   '<td><span class="u">'+esc(r.bookedFromUrl)+'</span></td>'+
+   '<td><span class="u">'+esc(r.entryUrl||'-')+'</span><span class="u muted">'+esc(r.referrer?'from '+r.referrer:'')+(r.utm?' · '+esc(r.utm):'')+'</span></td>'+
+   '<td>'+(isClick?'<span class="tag">opened chat</span>':'<span class="tag" style="background:#25D366;color:#fff">redirected</span>')+'</td>'+
+   '<td>'+(isClick?'':'<select data-st="'+esc(r.id)+'" aria-label="Status">'+STATUSES.map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select>')+'</td>'+
+   '<td><div class="row" style="flex-wrap:nowrap">'+(isClick?'':'<a class="btn wa sm" href="'+waChat(r)+'" target="_blank" rel="noopener">Chat</a>')+'<button class="btn ghost sm" type="button" data-del="'+esc(r.id)+'">Delete</button></div></td></tr>';
+}
+function exportCsv(){
+  var cols=['id','ts','type','name','phone','address','pincode','note','productId','productName','price','collection','bookedFromUrl','entryUrl','referrer','utm','lang','whatsapp','status'];
+  var out=[cols.join(',')].concat(filtered().map(function(r){return cols.map(function(c){return '"'+String(r[c]==null?'':r[c]).replace(/"/g,'""')+'"';}).join(',');}));
+  var blob=new Blob(['﻿'+out.join('\n')],{type:'text/csv;charset=utf-8'}), a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='weavara-bookings.csv'; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+}
+login();
+})();
+</script>
+</body>
+</html>
