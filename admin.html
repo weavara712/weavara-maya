@@ -53,6 +53,14 @@ td .u{display:block;max-width:300px;word-break:break-all;font-size:12px}
 .mode{font-size:13px;background:var(--beige);color:var(--navy);padding:6px 12px}
 .muted{color:#5b6b82}
 .empty{padding:40px;text-align:center}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.tab{min-height:42px;padding:0 22px;border:1px solid var(--gold);background:var(--ivory);color:var(--navy);font-size:14px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.tab.on{background:var(--navy);color:var(--ivory);border-color:var(--navy)}
+.trend{display:flex;align-items:flex-end;gap:6px;height:170px;padding-top:10px}
+.trend .c{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;font-size:11px}
+.trend .c i{display:block;width:100%;background:var(--gold);min-height:2px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px}
+.grid2 .panel{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -66,12 +74,12 @@ var CFG = {
   USER: 'maya',             // admin username
   PASS: 'admin',            // admin password
   /* --------------------------------------------- */
-  API: '',                  // Google Apps Script web app URL (same as in index.html). Leave '' for demo mode.
+  API: '/api',              // Vercel backend (api/index.js). Use '' for demo mode.
   WA_PREFIX: '91'           // country code used for "Open chat" buttons
 };
 var STATUSES=['New','Contacted','Confirmed','Paid','Dispatched','Delivered','Cancelled'];
-var KEY='weavara_bookings', META='weavara_admin_status', SESSION='weavara_admin_ok';
-var state={rows:[],key:'',filter:'',type:'all',status:'all',authed:false,error:''};
+var KEY='weavara_bookings', VKEY='weavara_visits', META='weavara_admin_status', SESSION='weavara_admin_ok';
+var state={rows:[],visits:[],tab:'bookings',key:'',filter:'',type:'all',status:'all',authed:false,error:''};
 var $=function(id){return document.getElementById(id);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
@@ -79,11 +87,13 @@ function set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 
 /* ========= DATA ========= */
 function loadLocal(){ var a=[]; try{a=JSON.parse(get(KEY)||'[]');}catch(e){} var m={}; try{m=JSON.parse(get(META)||'{}');}catch(e){} a.forEach(function(r){ if(m[r.id]) r.status=m[r.id]; }); return a; }
+function loadLocalVisits(){ var a=[]; try{a=JSON.parse(get(VKEY)||'[]');}catch(e){} return a; }
 function load(cb){
-  if(!CFG.API){ state.rows=loadLocal(); return cb(true); }
+  if(!CFG.API){ state.rows=loadLocal(); state.visits=loadLocalVisits(); return cb(true); }
   fetch(CFG.API+(CFG.API.indexOf('?')>-1?'&':'?')+'action=list&key='+encodeURIComponent(state.key)).then(function(r){return r.json();}).then(function(j){
     if(!j||!j.ok){ state.error='Wrong username or password.'; return cb(false); }
-    state.rows=j.rows||[]; cb(true);
+    state.rows=j.rows||[];
+    return fetch(CFG.API+(CFG.API.indexOf('?')>-1?'&':'?')+'action=visits&key='+encodeURIComponent(state.key)).then(function(r){return r.json();}).then(function(v){ state.visits=(v&&v.ok&&v.rows)||[]; cb(true); }).catch(function(){ state.visits=[]; cb(true); });
   }).catch(function(){ state.error='Could not reach the server. Check the API URL and that the web app is deployed for "Anyone".'; cb(false); });
 }
 function setStatus(id,st){
@@ -109,7 +119,7 @@ function login(){
     if(!CFG.API){
       if(u===CFG.USER && p===CFG.PASS){
         try{sessionStorage.setItem(SESSION,'1');}catch(x){}
-        state.error=''; state.authed=true; state.rows=loadLocal(); render();
+        state.error=''; state.authed=true; state.rows=loadLocal(); state.visits=loadLocalVisits(); render();
       } else { state.error='Wrong username or password.'; login(); }
       return;
     }
@@ -142,21 +152,62 @@ function filtered(){
     return true;
   }).sort(function(a,b){return String(b.ts).localeCompare(String(a.ts));});
 }
-function render(){
+function host(u){ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return u; } }
+function dayKey(ts){ var d=new Date(ts); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function uniq(arr){ var m={}; arr.forEach(function(x){ m[x]=1; }); return Object.keys(m).length; }
+function bars(pairs,empty){
+  if(!pairs.length) return '<p class="muted">'+(empty||'No data yet.')+'</p>';
+  var max=pairs[0][1];
+  return '<div class="src">'+pairs.map(function(x){return '<div><span class="bar" style="width:'+Math.max(6,Math.round(x[1]/max*220))+'px"></span><b>'+x[1]+'</b><code>'+esc(x[0])+'</code></div>';}).join('')+'</div>';
+}
+function tally(items,keyFn,limit){
+  var m={}; items.forEach(function(x){ var k=keyFn(x); m[k]=(m[k]||0)+1; });
+  return Object.keys(m).map(function(k){return [k,m[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,limit||8);
+}
+function visitsHtml(){
+  var v=state.visits.slice().sort(function(a,b){return String(a.ts).localeCompare(String(b.ts));});
+  var first={}; v.forEach(function(r){ if(!first[r.sid]) first[r.sid]=r; });
+  var sess=Object.keys(first).map(function(k){return first[k];});
+  var today=dayKey(Date.now());
+  var todaySess=sess.filter(function(r){return dayKey(r.ts)===today;});
+  var week=sess.filter(function(r){return inRange(r.ts,7);});
+  var bk=state.rows.filter(function(r){return r.type==='order'||r.type==='consultation';}).length;
+  var conv=sess.length?(bk/sess.length*100):0;
+  var src=function(r){ var m=/utm_source=([^&]+)/.exec(r.utm||''); if(m) return 'utm: '+decodeURIComponent(m[1]); if(r.referrer) return host(r.referrer); return 'Direct / typed link'; };
+  var days=[]; for(var i=13;i>=0;i--){ var d=new Date(Date.now()-i*864e5); days.push(dayKey(d)); }
+  var cnt={}; sess.forEach(function(r){ var k=dayKey(r.ts); cnt[k]=(cnt[k]||0)+1; });
+  var mx=Math.max.apply(null,days.map(function(k){return cnt[k]||0;}).concat([1]));
+  var trend='<div class="trend">'+days.map(function(k){var n=cnt[k]||0; return '<div class="c"><span>'+(n||'')+'</span><i style="height:'+Math.round(n/mx*120)+'px"></i><span class="muted">'+k.slice(8)+'</span></div>';}).join('')+'</div>';
+  var recent=v.slice(-100).reverse();
+  return '<div class="stats"><div class="stat"><b>'+uniq(v.map(function(r){return r.vid;}))+'</b><span>Unique visitors</span></div><div class="stat"><b>'+sess.length+'</b><span>Visits (sessions)</span></div><div class="stat"><b>'+v.length+'</b><span>Page views</span></div><div class="stat"><b>'+todaySess.length+'</b><span>Visits today</span></div><div class="stat"><b>'+week.length+'</b><span>Visits last 7 days</span></div><div class="stat"><b>'+conv.toFixed(1)+'%</b><span>Visits that booked</span></div></div>'+
+  '<div class="panel"><h2>Visits per day (last 14 days)</h2>'+trend+'</div>'+
+  '<div class="grid2"><div class="panel"><h2>Most viewed pages</h2>'+bars(tally(v,function(r){return r.route||'home';},10),'No visits yet. Open the website once and refresh.')+'</div>'+
+  '<div class="panel"><h2>Where visitors came from</h2>'+bars(tally(sess,src,10))+'</div>'+
+  '<div class="panel"><h2>Language</h2>'+bars(tally(sess,function(r){return r.lang==='hi'?'Hindi':'English';}))+'</div>'+
+  '<div class="panel"><h2>Device</h2>'+bars(tally(sess,function(r){return r.device==='mobile'?'Mobile':'Desktop';}))+'</div></div>'+
+  '<div class="panel" style="margin-top:20px"><h2>Recent page views</h2>'+(recent.length?'<div class="tw"><table style="min-width:760px"><thead><tr><th>Time</th><th>Page</th><th>Source</th><th>Language</th><th>Device</th><th>Visitor</th></tr></thead><tbody>'+recent.map(function(r){return '<tr><td>'+fmt(r.ts)+'</td><td><b>'+esc(r.route||'home')+'</b><span class="u muted">'+esc(r.page)+'</span></td><td>'+esc(r.referrer||r.utm?src(r):'')+'</td><td>'+esc(r.lang==='hi'?'Hindi':'English')+'</td><td>'+esc(r.device)+'</td><td><span class="muted">'+esc(String(r.vid).slice(0,8))+'</span></td></tr>';}).join('')+'</tbody></table></div>':'<div class="empty muted">No visits recorded yet.</div>')+'</div>';
+}
+function bookingsHtml(){
   var rows=state.rows, bk=rows.filter(function(r){return r.type!=='whatsapp_click';});
   var rev=bk.filter(function(r){return r.type==='order'&&r.price&&r.status!=='Cancelled';}).reduce(function(s,r){return s+(+r.price||0);},0);
   var list=filtered();
-  $('app').innerHTML=
-  '<div class="top"><div><h1>WEAVARA ADMIN</h1><small>Bookings, orders and WhatsApp redirects</small></div><div class="row"><span class="mode">'+(CFG.API?'Live: Google Sheet backend':'Demo: this browser only')+'</span><button class="btn ghost sm" id="rf" type="button">Refresh</button><button class="btn ghost sm" id="csv" type="button">Export CSV</button><button class="btn ghost sm" id="lo" type="button">Logout</button></div></div>'+
-  '<div class="wrap">'+
-  '<div class="stats"><div class="stat"><b>'+bk.length+'</b><span>Total bookings</span></div><div class="stat"><b>'+bk.filter(function(r){return inRange(r.ts,1);}).length+'</b><span>Last 24 hours</span></div><div class="stat"><b>'+bk.filter(function(r){return r.type==='order';}).length+'</b><span>Saree orders</span></div><div class="stat"><b>'+bk.filter(function(r){return r.type==='consultation';}).length+'</b><span>Consultations</span></div><div class="stat"><b>'+rows.filter(function(r){return r.type==='whatsapp_click';}).length+'</b><span>WhatsApp button taps</span></div><div class="stat"><b>₹'+rev.toLocaleString('en-IN')+'</b><span>Order value (open + won)</span></div></div>'+
+  return '<div class="stats"><div class="stat"><b>'+bk.length+'</b><span>Total bookings</span></div><div class="stat"><b>'+bk.filter(function(r){return inRange(r.ts,1);}).length+'</b><span>Last 24 hours</span></div><div class="stat"><b>'+bk.filter(function(r){return r.type==='order';}).length+'</b><span>Saree orders</span></div><div class="stat"><b>'+bk.filter(function(r){return r.type==='consultation';}).length+'</b><span>Consultations</span></div><div class="stat"><b>'+rows.filter(function(r){return r.type==='whatsapp_click';}).length+'</b><span>WhatsApp button taps</span></div><div class="stat"><b>₹'+rev.toLocaleString('en-IN')+'</b><span>Order value (open + won)</span></div></div>'+
   '<div class="panel"><h2>Where bookings came from (page URL)</h2>'+sourceTable(rows)+'</div>'+
   '<div class="panel"><h2>All activity</h2><div class="row" style="margin-bottom:12px"><input id="q" type="search" placeholder="Search name, phone, pincode, saree, URL" value="'+esc(state.filter)+'" aria-label="Search"><select id="ft" aria-label="Type"><option value="all">All types</option><option value="order">Orders</option><option value="consultation">Consultations</option><option value="whatsapp_click">WhatsApp taps</option></select><select id="fs" aria-label="Status"><option value="all">All statuses</option>'+STATUSES.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></div>'+
-  (list.length?'<div class="tw"><table><thead><tr><th>Time</th><th>Type</th><th>Customer</th><th>Address</th><th>Saree</th><th>Booked from page (URL)</th><th>Landing URL / referrer</th><th>WhatsApp</th><th>Status</th><th></th></tr></thead><tbody>'+list.map(rowHtml).join('')+'</tbody></table></div>':'<div class="empty muted">No records match. Place a test order on the website and refresh.</div>')+'</div></div>';
-  $('ft').value=state.type; $('fs').value=state.status;
+  (list.length?'<div class="tw"><table><thead><tr><th>Time</th><th>Type</th><th>Customer</th><th>Address</th><th>Saree</th><th>Booked from page (URL)</th><th>Landing URL / referrer</th><th>WhatsApp</th><th>Status</th><th></th></tr></thead><tbody>'+list.map(rowHtml).join('')+'</tbody></table></div>':'<div class="empty muted">No records match. Place a test order on the website and refresh.</div>')+'</div>';
+}
+function render(){
+  var isV=state.tab==='visits';
+  $('app').innerHTML=
+  '<div class="top"><div><h1>WEAVARA ADMIN</h1><small>Visits, bookings, orders and WhatsApp redirects</small></div><div class="row"><span class="mode">'+(CFG.API?'Live: Google Sheet backend':'Demo: this browser only')+'</span><button class="btn ghost sm" id="rf" type="button">Refresh</button><button class="btn ghost sm" id="csv" type="button">Export CSV</button><button class="btn ghost sm" id="lo" type="button">Logout</button></div></div>'+
+  '<div class="wrap"><div class="tabs" role="tablist"><button class="tab'+(isV?'':' on')+'" role="tab" aria-selected="'+(!isV)+'" data-tab="bookings" type="button">Bookings</button><button class="tab'+(isV?' on':'')+'" role="tab" aria-selected="'+isV+'" data-tab="visits" type="button">Website visits</button></div>'+
+  (isV?visitsHtml():bookingsHtml())+'</div>';
   $('rf').onclick=function(){ load(function(){render();}); };
   $('csv').onclick=exportCsv;
   $('lo').onclick=logout;
+  Array.prototype.forEach.call(document.querySelectorAll('[data-tab]'),function(el){ el.onclick=function(){ state.tab=el.getAttribute('data-tab'); render(); }; });
+  if(isV) return;
+  $('ft').value=state.type; $('fs').value=state.status;
   $('q').oninput=function(e){ state.filter=e.target.value; var pos=e.target.selectionStart; render(); var q=$('q'); q.focus(); q.setSelectionRange(pos,pos); };
   $('ft').onchange=function(e){state.type=e.target.value;render();};
   $('fs').onchange=function(e){state.status=e.target.value;render();};
@@ -177,15 +228,17 @@ function rowHtml(r){
    '<td><div class="row" style="flex-wrap:nowrap">'+(isClick?'':'<a class="btn wa sm" href="'+waChat(r)+'" target="_blank" rel="noopener">Chat</a>')+'<button class="btn ghost sm" type="button" data-del="'+esc(r.id)+'">Delete</button></div></td></tr>';
 }
 function exportCsv(){
-  var cols=['id','ts','type','name','phone','address','pincode','note','productId','productName','price','collection','bookedFromUrl','entryUrl','referrer','utm','lang','whatsapp','status'];
-  var out=[cols.join(',')].concat(filtered().map(function(r){return cols.map(function(c){return '"'+String(r[c]==null?'':r[c]).replace(/"/g,'""')+'"';}).join(',');}));
+  var isV=state.tab==='visits';
+  var cols=isV?['id','ts','route','page','lang','device','referrer','utm','entryUrl','vid','sid']:['id','ts','type','name','phone','address','pincode','note','productId','productName','price','collection','bookedFromUrl','entryUrl','referrer','utm','lang','whatsapp','status'];
+  var data=isV?state.visits:filtered();
+  var out=[cols.join(',')].concat(data.map(function(r){return cols.map(function(c){var v=String(r[c]==null?'':r[c]); if(/^[=+\-@]/.test(v)) v="'"+v; return '"'+v.replace(/"/g,'""')+'"';}).join(',');}));
   var blob=new Blob(['\ufeff'+out.join('\n')],{type:'text/csv;charset=utf-8'}), a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download='weavara-bookings.csv'; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+  a.href=URL.createObjectURL(blob); a.download=isV?'weavara-visits.csv':'weavara-bookings.csv'; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
 }
 
 /* ========= START ========= */
 var ok=false; try{ok=sessionStorage.getItem(SESSION)==='1';}catch(e){}
-if(ok&&!CFG.API){ state.authed=true; state.rows=loadLocal(); render(); } else login();
+if(ok&&!CFG.API){ state.authed=true; state.rows=loadLocal(); state.visits=loadLocalVisits(); render(); } else login();
 })();
 </script>
 </body>
