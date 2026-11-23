@@ -710,15 +710,15 @@ var gal = t('g_i').map(function(x,i){
   aboutSection()+
   '<section class="sec" id="faq"><div class="wrap split" style="align-items:flex-start"><div class="stack" style="flex:1 1 280px"><p class="eyebrow">'+esc(t('faq_e'))+'</p><h2 class="h2">'+esc(t('faq_t'))+'</h2></div><div style="flex:2 1 460px">'+faqHtml()+'</div></div></section>';
 }
-
 function storySection(){
-  return '<section class="sec bg-beige"><div class="wrap split"><div class="pic3">'+
-  '<div class="tall"><img loading="lazy" src="varanasi story1.jpeg" alt="Varanasi Story 1" style="aspect-ratio:3/4;object-fit:cover"></div>'+
-  '<div><img loading="lazy" src="varanasi story2.jpeg" alt="Varanasi Story 2" style="aspect-ratio:1/1;object-fit:cover"></div>'+
-  '<div><img loading="lazy" src="varanasi story3.jpeg" alt="Varanasi Story 3" style="aspect-ratio:1/1;object-fit:cover"></div>'+
-  '</div><div class="stack" style="gap:20px"><p class="eyebrow">'+esc(t('st_e'))+'</p><h2 class="h2">'+esc(t('st_t'))+'</h2><p class="quote">'+esc(t('st_q'))+'</p><p style="font-size:17px">'+esc(t('st_p'))+'</p></div></div></section>';
+  return '<section class="sec bg-beige"><div class="wrap split"><div class="pic3"><div class="tall"><img loading="lazy" src="'+uri(ghatSVG())+'" alt="" style="aspect-ratio:3/4"></div><div><img loading="lazy" src="'+uri(loomSVG())+'" alt="" style="aspect-ratio:1/1"></div><div><img loading="lazy" src="'+uri(macroSVG(2))+'" alt="" style="aspect-ratio:1/1"></div></div><div class="stack" style="gap:20px"><p class="eyebrow">'+esc(t('st_e'))+'</p><h2 class="h2">'+esc(t('st_t'))+'</h2><p class="quote">'+esc(t('st_q'))+'</p><p style="font-size:17px">'+esc(t('st_p'))+'</p></div></div></section>';
 }
-
+function aboutSection(){
+  return '<section class="sec"><div class="wrap split"><div style="flex:0 1 320px;max-width:320px"><div class="logo" style="width:100%;height:auto;aspect-ratio:1/1;border-width:3px"><img src="'+LOGO+'" alt="Weavara"></div></div><div class="stack" style="gap:20px"><p class="eyebrow">'+esc(t('a_e'))+'</p><h2 class="h2">'+esc(t('a_t'))+'</h2><p style="font-size:17px">'+esc(t('a_p'))+'</p></div></div></section>';
+}
+function bookingBand(){
+  return '<section class="dark"><div class="wrap split" style="padding-top:84px;padding-bottom:84px;justify-content:space-between"><div class="stack" style="gap:20px;max-width:680px"><p class="eyebrow">'+esc(t('b_e'))+'</p><h2 class="h2">'+esc(t('b_t'))+'</h2><p class="lead">'+esc(t('b_p'))+'</p></div><div class="stack" style="flex:0 1 320px;gap:14px"><a class="btn light block" href="'+L('book')+'" data-act="book">'+esc(t('b_a'))+'</a><a class="btn line block" href="'+waLink(t('wa_hi'))+'" target="_blank" rel="noopener" data-act="wa">'+esc(t('b_b'))+'</a></div></div></section>';
+}
 function pageCollection(slug){
   var c=collOf(slug); if(!c) return pageNF();
   var items=inColl(slug), sort=state.sort||'feat';
