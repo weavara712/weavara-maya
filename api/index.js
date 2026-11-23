@@ -50,7 +50,19 @@ function rows(list) {
 
 module.exports = async function handler(req, res) {
   try {
-    if (!REDIS_URL || !REDIS_TOKEN || !ADMIN_KEY) return send(res, { ok: false, error: 'config' });
+   const missing = [];
+
+if (!REDIS_URL) missing.push('REDIS_URL');
+if (!REDIS_TOKEN) missing.push('REDIS_TOKEN');
+if (!ADMIN_KEY) missing.push('ADMIN_KEY');
+
+if (missing.length) {
+  return send(res, {
+    ok: false,
+    error: 'config',
+    missing: missing
+  });
+}
 
     if (req.method === 'GET') {
       const q = req.query || {};
