@@ -687,8 +687,18 @@ function pageHome(){
   var tr=inColl('trending').slice(0,8);
   var mats=t('m_i').map(function(x){return '<div class="card top"><h3>'+esc(x)+'</h3></div>';}).join('');
   var sv=t('s_i').map(function(x){return '<div class="card"><span class="bar3"></span><h3>'+esc(x[0])+'</h3><p>'+esc(x[1])+'</p></div>';}).join('');
-  var gal=t('g_i').map(function(x,i){return '<figure><img loading="lazy" src="'+uri(macroSVG(i))+'" alt="'+esc(x)+'"><figcaption>'+esc(x)+'</figcaption></figure>';}).join('');
-  return heroHtml()+
+var GALLERY_IMAGES = [
+  'images/motifs.jpg',
+  'images/zari.jpg',
+  'images/borders.jpg',
+  'images/handwork.jpg',
+  'images/texture.jpg',
+  'images/finishing.jpg'
+];
+
+var gal = t('g_i').map(function(x,i){
+  return '<figure><img loading="lazy" src="'+GALLERY_IMAGES[i]+'" alt="'+esc(x)+'"><figcaption>'+esc(x)+'</figcaption></figure>';
+}).join('');  return heroHtml()+
   '<section class="sec"><div class="wrap stack" style="gap:44px">'+sectionHead(t('feat_e'),t('feat_t'),t('feat_p'))+collTiles()+'</div></section>'+
   '<section class="sec bg-beige"><div class="wrap stack" style="gap:40px"><div class="toolbar"><div class="stack" style="gap:10px"><p class="eyebrow">'+esc(t('trend_e'))+'</p><h2 class="h2">'+esc(t('trend_t'))+'</h2></div><a class="btn ghost" href="'+L('collection/trending')+'">'+esc(t('viewAll'))+'</a></div><div class="grid g4">'+tr.map(productCard).join('')+'</div></div></section>'+
   '<section class="maroonbg dark" style="background:var(--maroon)"><div class="wrap split" style="padding-top:64px;padding-bottom:64px"><div class="stack" style="gap:20px"><p class="eyebrow">'+esc(t('fest_e'))+'</p><h2 class="h2">'+esc(t('fest_t'))+'</h2><p class="lead">'+esc(t('fest_p'))+'</p><div><a class="btn light" href="'+L('collection/festive')+'">'+esc(t('fest_b'))+'</a></div></div><div style="aspect-ratio:16/10;overflow:hidden"><img style="width:100%;height:100%;object-fit:cover" loading="lazy" src="'+uri(sareeSVG(9,2,5,1200,750))+'" alt=""></div></div></section>'+
