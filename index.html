@@ -467,7 +467,74 @@ function sareeSVG(ci,motif,seed,w,h){
   s+='<rect width="'+w+'" height="'+h+'" fill="url(#wv)"/></svg>';
   return s;
 }
-function pImg(p,w,h){ return uri(sareeSVG(p.ci,p.motif,p.seed,w,h)); }
+
+// ===== 50 SAREE IMAGES =====
+var SAREE_PHOTOS = {
+  // TRENDING - 10 images
+  'TR-01': 'images/TR-01.jpg',
+  'TR-02': 'images/TR-02.jpg',
+  'TR-03': 'images/TR-03.jpg',
+  'TR-04': 'images/TR-04.jpg',
+  'TR-05': 'images/TR-05.jpg',
+  'TR-06': 'images/TR-06.jpg',
+  'TR-07': 'images/TR-07.jpg',
+  'TR-08': 'images/TR-08.jpg',
+  'TR-09': 'images/TR-09.jpg',
+  'TR-10': 'images/TR-10.jpg',
+
+  // BANARASI - 10 images
+  'BN-01': 'images/BN-01.jpg',
+  'BN-02': 'images/BN-02.jpg',
+  'BN-03': 'images/BN-03.jpg',
+  'BN-04': 'images/BN-04.jpg',
+  'BN-05': 'images/BN-05.jpg',
+  'BN-06': 'images/BN-06.jpg',
+  'BN-07': 'images/BN-07.jpg',
+  'BN-08': 'images/BN-08.jpg',
+  'BN-09': 'images/BN-09.jpg',
+  'BN-10': 'images/BN-10.jpg',
+
+  // FESTIVE - 10 images
+  'WF-01': 'images/WF-01.jpg',
+  'WF-02': 'images/WF-02.jpg',
+  'WF-03': 'images/WF-03.jpg',
+  'WF-04': 'images/WF-04.jpg',
+  'WF-05': 'images/WF-05.jpg',
+  'WF-06': 'images/WF-06.jpg',
+  'WF-07': 'images/WF-07.jpg',
+  'WF-08': 'images/WF-08.jpg',
+  'WF-09': 'images/WF-09.jpg',
+  'WF-10': 'images/WF-10.jpg',
+
+  // EXCLUSIVE - 10 images
+  'EX-01': 'images/EX-01.jpg',
+  'EX-02': 'images/EX-02.jpg',
+  'EX-03': 'images/EX-03.jpg',
+  'EX-04': 'images/EX-04.jpg',
+  'EX-05': 'images/EX-05.jpg',
+  'EX-06': 'images/EX-06.jpg',
+  'EX-07': 'images/EX-07.jpg',
+  'EX-08': 'images/EX-08.jpg',
+  'EX-09': 'images/EX-09.jpg',
+  'EX-10': 'images/EX-10.jpg',
+
+  // CUSTOM - 10 images
+  'CU-01': 'images/CU-01.jpg',
+  'CU-02': 'images/CU-02.jpg',
+  'CU-03': 'images/CU-03.jpg',
+  'CU-04': 'images/CU-04.jpg',
+  'CU-05': 'images/CU-05.jpg',
+  'CU-06': 'images/CU-06.jpg',
+  'CU-07': 'images/CU-07.jpg',
+  'CU-08': 'images/CU-08.jpg',
+  'CU-09': 'images/CU-09.jpg',
+  'CU-10': 'images/CU-10.jpg'
+};
+
+function pImg(p,w,h){
+  return SAREE_PHOTOS[p.id] || uri(sareeSVG(p.ci,p.motif,p.seed,w,h));
+}
+
 function ghatSVG(){
   var s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice"><defs>';
   s+='<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0F2747"/><stop offset=".5" stop-color="#6B1F2B"/><stop offset=".78" stop-color="#CDA45F"/></linearGradient>';
@@ -602,7 +669,18 @@ function heroHtml(){
 function collTiles(){
   var order=['trending','banarasi','festive','exclusive','custom'];
   return '<div class="grid g5">'+order.map(function(s,i){
-    return '<a class="tile" href="'+L('collection/'+s)+'"><div class="im"><img loading="lazy" src="'+pImg(inColl(s)[(i*2+1)%PER_COLL])+'" alt="'+esc(cn(s))+'" width="600" height="800"></div><h3>'+esc(cn(s))+'</h3><span class="go">'+esc(t('view'))+' →</span></a>';
+ 
+var COLLECTION_COVERS = {
+  'trending': 'images/cover-trending.jpg',
+  'banarasi': 'images/cover-banarasi.jpg',
+  'festive': 'images/cover-festive.jpg',
+  'exclusive': 'images/cover-exclusive.jpg',
+  'custom': 'images/cover-custom.jpg'
+};
+
+var cover = COLLECTION_COVERS[s] || pImg(inColl(s)[(i*2+1)%PER_COLL]);
+
+return '<a class="tile" href="'+L('collection/'+s)+'"><div class="im"><img loading="lazy" src="'+cover+'" alt="'+esc(cn(s))+'" width="600" height="800"></div><h3>'+esc(cn(s))+'</h3><span class="go">'+esc(t('view'))+' →</span></a>';
   }).join('')+'</div>';
 }
 function pageHome(){
