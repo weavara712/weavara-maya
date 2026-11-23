@@ -228,9 +228,9 @@ var LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAYAAADNkKWqAA
    Leave d empty to show the built-in illustration. Example: d:'banner1.jpg', m:'banner1-mobile.jpg' */
 
 var HERO = [
-  {d:'Weavara Sarees_ Limited Design.png', m:'Weavara Sarees_ Limited Design Mobile.png', href:'collection/banarasi', alt:{en:'Weavara Trending Sarees Collection', hi:'वीवारा ट्रेंडिंग साड़ी कलेक्शन'}},
-  {d:'Weavara Trending Sarees Collection.png', m:'Weavara Trending Sarees Collection Mobile.png', href:'collection/festive', alt:{en:'Wedding and festive sarees', hi:'शादी और त्योहार की साड़ियाँ'}},
-  {d:'Weavara Wedding Sarees Collection.png', m:'Weavara Wedding Sarees Collection Mobile.png', href:'book', alt:{en:'Customised sarees, book a consultation', hi:'कस्टम साड़ियाँ, परामर्श बुक करें'}}
+  {d:'Weavara Sarees_ Limited Design.png', m:'m1.jpeg', href:'collection/banarasi', alt:{en:'Weavara Trending Sarees Collection', hi:'वीवारा ट्रेंडिंग साड़ी कलेक्शन'}},
+  {d:'Weavara Trending Sarees Collection.png', m:'m2.jpeg', href:'collection/festive', alt:{en:'Wedding and festive sarees', hi:'शादी और त्योहार की साड़ियाँ'}},
+  {d:'Weavara Wedding Sarees Collection.png', m:'m3.jpeg', href:'book', alt:{en:'Customised sarees, book a consultation', hi:'कस्टम साड़ियाँ, परामर्श बुक करें'}}
 ];
 
 /* ================= TEXT (English + Hindi) ================= */
@@ -702,7 +702,7 @@ var gal = t('g_i').map(function(x,i){
   return '<figure><img loading="lazy" src="'+GALLERY_IMAGES[i]+'" alt="'+esc(x)+'"><figcaption>'+esc(x)+'</figcaption></figure>';
 }).join('');  return heroHtml()+
   '<section class="sec"><div class="wrap stack" style="gap:44px">'+sectionHead(t('feat_e'),t('feat_t'),t('feat_p'))+collTiles()+'</div></section>'+
-  '<section class="maroonbg dark" style="background:var(--maroon)"><div class="wrap split" style="padding-top:64px;padding-bottom:64px"><div class="stack" style="gap:20px"><p class="eyebrow">'+esc(t('fest_e'))+'</p><h2 class="h2">'+esc(t('fest_t'))+'</h2><p class="lead">'+esc(t('fest_p'))+'</p><div><a class="btn light" href="'+L('collection/festive')+'">'+esc(t('fest_b'))+'</a></div></div><div style="aspect-ratio:16/10;overflow:hidden"><img style="width:100%;height:100%;object-fit:cover" loading="lazy" src="'+uri(sareeSVG(9,2,5,1200,750))+'" alt=""></div></div></section>'+
+  '<section class="maroonbg dark" style="background:var(--maroon)"><div class="wrap split" style="padding-top:64px;padding-bottom:64px"><div class="stack" style="gap:20px"><p class="eyebrow">'+esc(t('fest_e'))+'</p><h2 class="h2">'+esc(t('fest_t'))+'</h2><p class="lead">'+esc(t('fest_p'))+'</p><div><a class="btn light" href="'+L('collection/festive')+'">'+esc(t('fest_b'))+'</a></div></div><div style="aspect-ratio:16/10;overflow:hidden"><img style="width:100%;height:100%;object-fit:cover" loading="lazy" src="wedding%20and%20festival.jpeg" alt=""></div></div></section>'+
   storySection()+
   '<section class="sec"><div class="wrap stack" style="gap:44px">'+sectionHead(t('g_e'),t('g_t'),t('g_p'))+'<div class="gal">'+gal+'</div></div></section>'+
   '<section class="sec bg-beige"><div class="wrap stack" style="gap:40px">'+sectionHead(t('m_e'),t('m_t'),t('m_p'))+'<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))">'+mats+'</div><p class="note">'+esc(t('m_n'))+'</p></div></section>'+
